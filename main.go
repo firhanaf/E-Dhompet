@@ -52,6 +52,19 @@ func main() {
 	switch menu {
 	case 1: // fitur Register
 	case 2: // fitur Login
+		loginUser := User{}
+		fmt.Println("Masukkan Nomor Telepon :")
+		fmt.Scanln(&loginUser.Phone)
+		fmt.Println("Masukkan Password :")
+		fmt.Scanln(&loginUser.Password)
+
+		rows, errLogin := db.Query("select phone, password from users where phone = ? AND password = ?")
+		if errLogin != nil { // ketika terjadi error saat menjalankan select
+			log.Fatal("error run query select", errLogin.Error())
+		}
+
+		var allUsers []User
+
 	case 3: // view profile yang telah login
 	case 4: // update profil
 	case 5: // hapus akun
@@ -63,7 +76,5 @@ func main() {
 	case 0: // fitur logout
 
 	} // EOF menu
-
-	// test git push
 
 }
