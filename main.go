@@ -77,7 +77,6 @@ func main() {
 			}
 
 		case 3: // view profile yang telah login
-			// mysql : SELECT * FROM USER WHERE ID = ...
 			fmt.Println("View Profile")
 			loginUser := entities.User{}
 			fmt.Print("Masukkan Nomor Telepon : ")
@@ -86,13 +85,12 @@ func main() {
 			fmt.Scanln(&loginUser.Password)
 
 			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
-			fmt.Println(users)
 			for _, v := range users {
 				if loggedin {
-					fmt.Println("===========================\n ")
-					fmt.Println("Viewing Profile of:", v.Name)
-					fmt.Println("===========================\n ")
-					controllers.ReadProfile(db, v) // Pass the found user directly
+					fmt.Println("=========================")
+					fmt.Println("Displaying Profile of:", v.Name)
+					fmt.Println("=========================")
+					controllers.ReadProfile(db, v)
 				} else {
 					fmt.Println("Invalid phone or password")
 				}
@@ -100,17 +98,30 @@ func main() {
 
 		case 4: // update profil
 		case 5: // hapus akun
-		// mysql : DELETE FROM User WHERE ID = ...
-
 		case 6: // fitur topup saldo
+			fmt.Println("Top Up Balance")
+			loginUser := entities.User{}
+			fmt.Print("Masukkan Nomor Telepon : ")
+			fmt.Scanln(&loginUser.Phone)
+			fmt.Print("Masukkan Password : ")
+			fmt.Scanln(&loginUser.Password)
+
+			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
+			for _, v := range users {
+				if loggedin {
+					fmt.Println("Balance :", v.Balance)
+					controllers.AddMoney(db, v)
+				}
+			}
+
 		case 7: // fitur transfer dana
 		case 8: // fitur melihat history topup
 		case 9: // fitur melihat history transfer
 		case 10: // fitur melihat profil user lain dengan menggunakan phone number
 		case 0: // fitur logout
-
 			fmt.Println("Logging Out...")
 			return
+
 		default:
 			{
 				fmt.Println("Menu not available")
@@ -118,5 +129,4 @@ func main() {
 
 		} // EOF menu
 	}
-
 }
