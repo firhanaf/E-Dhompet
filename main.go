@@ -32,20 +32,22 @@ func main() {
 			// biasanya urutannya email, username, password, nama lengkap, nomor telepon, address
 
 			registerUser := entities.User{}
+			fmt.Println("Masukkan ID :") // Email
+			fmt.Scanln(&registerUser.Id)
 			fmt.Println("Masukkan Email :") // Email
 			fmt.Scanln(&registerUser.Email)
 			fmt.Println("Masukkan Username :") // Username
 			fmt.Scanln(&registerUser.Username)
 			fmt.Println("Masukkan Password :") // Password
 			fmt.Scanln(&registerUser.Password)
-			fmt.Println("Masukkan Username :") // Nama Lengkap
+			fmt.Println("Masukkan Nama :") // Nama Lengkap
 			fmt.Scanln(&registerUser.Name)
-			fmt.Println("Masukkan Username :") // Nomor Telepon
+			fmt.Println("Masukkan Nomor Telepon :") // Nomor Telepon
 			fmt.Scanln(&registerUser.Phone)
 			fmt.Println("Masukkan Adress :") // Address
 			fmt.Scanln(&registerUser.Address)
 
-			registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address) VALUES (?, ?, ?, ?, ?, ?, ?)", registerUser.Id, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address)
+			registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", registerUser.Id, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address, 0)
 			if errRegister != nil {
 				log.Fatal("error insert", errRegister.Error())
 			} else {
