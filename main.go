@@ -51,10 +51,70 @@ func main() {
 
 	switch menu {
 	case 1: // fitur Register
+
+		// biasanya urutannya email, username, password, nama lengkap, nomor telepon, address
+
+		registerUser := User{}
+		fmt.Println("Masukkan Email :") // Email
+		fmt.Scanln(&registerUser.Email)
+		fmt.Println("Masukkan Username :") // Username
+		fmt.Scanln(&registerUser.Username)
+		fmt.Println("Masukkan Password :") // Password
+		fmt.Scanln(&registerUser.Password)
+		fmt.Println("Masukkan Username :") // Nama Lengkap
+		fmt.Scanln(&registerUser.Name)
+		fmt.Println("Masukkan Username :") // Nomor Telepon
+		fmt.Scanln(&registerUser.Phone)
+		fmt.Println("Masukkan Adress :") // Address
+		fmt.Scanln(&registerUser.Address)
+
+		registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address) VALUES (?, ?, ?, ?, ?, ?, ?)", registerUser.Id, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address)
+		if errRegister != nil {
+			log.Fatal("error insert", errRegister.Error())
+		} else {
+			row, _ := registerRows.RowsAffected()
+			if row > 0 {
+				fmt.Println("Success Insert Data")
+			} else {
+				fmt.Println("Failed to Insert Data")
+			}
+		}
+
 	case 2: // fitur Login
+		loginUser := User{}
+		fmt.Println("Masukkan Nomor Telepon :")
+		fmt.Scanln(&loginUser.Phone)
+		fmt.Println("Masukkan Password :")
+		fmt.Scanln(&loginUser.Password)
+
+		rows, errLogin := db.Query("select phone, password from users where phone = ? AND password = ?")
+		if errLogin != nil { // ketika terjadi error saat menjalankan select
+			log.Fatal("error run query select", errLogin.Error())
+		}
+
+		var allUsers []User
+
 	case 3: // view profile yang telah login
+		// mysql : SELECT * FROM USER WHERE ID = ...
+		viewProfileRows, errViewProfile := db.Query("SELECT id, username, name, phone FROM users")
+
+		if err != nil {
+			log.Fatal("error view profile", errViewProfile.Error())
+		}
+		var allViewUsers []User
+		for viewProfileRows.Next() {
+			var dataViewUsers User
+			errScan := viewProfileRows.Scan(&dataViewUsers.Id, &dataViewUsers.Username, &dataViewUsers.Name, dataViewUsers.Phone)
+			if err != nil {
+				log.Fatal("error scan select", errScan.Error())
+			}
+			allViewUsers = append(allViewUsers, dataViewUsers)
+		}
+
 	case 4: // update profil
 	case 5: // hapus akun
+	// mysql : DELETE FROM User WHERE ID = ...
+
 	case 6: // fitur topup saldo
 	case 7: // fitur transfer dana
 	case 8: // fitur melihat history topup
