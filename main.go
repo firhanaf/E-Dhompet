@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"be18/acc-service/controllers"
 	"be18/acc-service/entities"
@@ -27,12 +28,41 @@ func main() {
 
 		switch menu {
 		case 1: // fitur Register
-		case 2:
-			fmt.Println("Login")
+
+			// biasanya urutannya email, username, password, nama lengkap, nomor telepon, address
+
+			registerUser := entities.User{}
+			fmt.Println("Masukkan Email :") // Email
+			fmt.Scanln(&registerUser.Email)
+			fmt.Println("Masukkan Username :") // Username
+			fmt.Scanln(&registerUser.Username)
+			fmt.Println("Masukkan Password :") // Password
+			fmt.Scanln(&registerUser.Password)
+			fmt.Println("Masukkan Username :") // Nama Lengkap
+			fmt.Scanln(&registerUser.Name)
+			fmt.Println("Masukkan Username :") // Nomor Telepon
+			fmt.Scanln(&registerUser.Phone)
+			fmt.Println("Masukkan Adress :") // Address
+			fmt.Scanln(&registerUser.Address)
+
+			registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address) VALUES (?, ?, ?, ?, ?, ?, ?)", registerUser.Id, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address)
+			if errRegister != nil {
+				log.Fatal("error insert", errRegister.Error())
+			} else {
+				row, _ := registerRows.RowsAffected()
+				if row > 0 {
+					fmt.Println("Success Insert Data")
+				} else {
+					fmt.Println("Failed to Insert Data")
+				}
+			}
+
+		case 2: // fitur Login
+
 			loginUser := entities.User{}
-			fmt.Print("Masukkan Nomor Telepon : ")
+			fmt.Println("Masukkan Nomor Telepon :")
 			fmt.Scanln(&loginUser.Phone)
-			fmt.Print("Masukkan Password : ")
+			fmt.Println("Masukkan Password :")
 			fmt.Scanln(&loginUser.Password)
 
 			users, login := controllers.Login(db, loginUser.Phone, loginUser.Password)
@@ -44,7 +74,8 @@ func main() {
 				}
 			}
 
-		case 3: // view profile
+		case 3: // view profile yang telah login
+			// mysql : SELECT * FROM USER WHERE ID = ...
 			fmt.Println("View Profile")
 			loginUser := entities.User{}
 			fmt.Print("Masukkan Nomor Telepon : ")
@@ -67,18 +98,22 @@ func main() {
 
 		case 4: // update profil
 		case 5: // hapus akun
+		// mysql : DELETE FROM User WHERE ID = ...
+
 		case 6: // fitur topup saldo
 		case 7: // fitur transfer dana
 		case 8: // fitur melihat history topup
 		case 9: // fitur melihat history transfer
 		case 10: // fitur melihat profil user lain dengan menggunakan phone number
 		case 0: // fitur logout
+
 			fmt.Println("Logging Out...")
 			return
 		default:
 			{
 				fmt.Println("Menu not available")
 			}
+
 		} // EOF menu
 	}
 
