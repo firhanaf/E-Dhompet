@@ -12,8 +12,10 @@ email varchar(100) unique not null,
 password varchar(100) not null
 );
 
+select * from users;
+
 alter table users
-add column balance int not null;
+MODIFY COLUMN balance decimal default 0;
 
 insert into users(id, username, name, address, phone, email, password)
 values("UID-00001", "adi12", "adi", "aceh", "081234", "adi@dai.com", "qwerty"),
