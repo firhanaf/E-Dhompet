@@ -97,6 +97,20 @@ func main() {
 			}
 
 		case 4: // update profil
+
+			fmt.Println("Update Profile")
+			loginUser := entities.User{}
+			fmt.Print("Masukkan Nomor Telepon : ")
+			fmt.Scanln(&loginUser.Phone)
+			fmt.Print("Masukkan Password : ")
+			fmt.Scanln(&loginUser.Password)
+			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
+			for _, v := range users {
+				if loggedin {
+					controllers.UpdateUser(db, v)
+				}
+			}
+
 		case 5: // hapus akun
 		case 6: // fitur topup saldo
 			fmt.Println("Top Up Balance")
