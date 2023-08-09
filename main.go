@@ -112,6 +112,22 @@ func main() {
 			}
 
 		case 5: // hapus akun
+			// mysql : DELETE FROM User WHERE username = ...
+			fmt.Println("Masukkan Username yang ingin dihapus :")
+			deleteAccount := entities.User{}
+			fmt.Scanln(&deleteAccount.Username)
+
+			deleteAccountRows, errDelete := db.Exec("DELETE FROM users WHERE username = ?", deleteAccount.Username)
+			if err != nil {
+				log.Fatal("error delete", errDelete.Error())
+			} else {
+				row, _ := deleteAccountRows.RowsAffected()
+				if row > 0 {
+					fmt.Println("Delete Success")
+				} else {
+					fmt.Println("Delete Failed")
+				}
+			}
 		case 6: // fitur topup saldo
 			fmt.Println("Top Up Balance")
 			loginUser := entities.User{}
@@ -130,8 +146,49 @@ func main() {
 
 		case 7: // fitur transfer dana
 		case 8: // fitur melihat history topup
+			fmt.Println("Top-Up History")
+			loginUser := entities.User{}
+			fmt.Print("Masukkan Nomor Telepon : ")
+			fmt.Scanln(&loginUser.Phone)
+			fmt.Print("Masukkan Password : ")
+			fmt.Scanln(&loginUser.Password)
+			fmt.Println("==================")
+
+			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
+			for _, v := range users {
+				if loggedin {
+					controllers.HistoryTopup(db, v)
+					fmt.Println("ID :", v.Topup_Id)
+					fmt.Println("User_ID :", v.Id)
+					fmt.Println("Amount :", v.Amount)
+					fmt.Println("Status :", v.Status)
+					fmt.Println("Time :", v.Transaction_time_topup)
+					fmt.Println("==================")
+				}
+			}
+
 		case 9: // fitur melihat history transfer
 		case 10: // fitur melihat profil user lain dengan menggunakan phone number
+			viewByPhone := entities.User{}
+			fmt.Println("Masukan Nomor Telepone :")
+			fmt.Scanln(&viewByPhone.Phone)
+
+			viewProfileRows, errViewProfile := db.Query("SELECT ID, username, name, phone FROM users WHERE phone = ?", viewByPhone.Phone)
+			if err != nil {
+				log.Fatal("error view profile", errViewProfile.Error())
+			}
+			var allViewUsers []entities.User
+			for viewProfileRows.Next() {
+				var dataViewUsers entities.User                                                                                        // variabel penampung untuk membaca viewProfileRows
+				errScan := viewProfileRows.Scan(&dataViewUsers.Id, &dataViewUsers.Username, &dataViewUsers.Name, &dataViewUsers.Phone) // membaca yang dibaca oleh dbquery di viewProfileRows
+				if err != nil {
+					log.Fatal("error scan select", errScan.Error())
+				}
+
+				allViewUsers = append(allViewUsers, dataViewUsers)
+
+			}
+			fmt.Println("Data User :", allViewUsers)
 		case 0: // fitur logout
 			fmt.Println("Logging Out...")
 			return
