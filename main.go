@@ -1,6 +1,7 @@
 package main
 
 import (
+	"be18/acc-service/entities"
 	"database/sql"
 	"fmt"
 	"log"
@@ -119,6 +120,12 @@ func main() {
 	case 7: // fitur transfer dana
 	case 8: // fitur melihat history topup
 	case 9: // fitur melihat history transfer
+		newTransfer := entities.Transfer{}
+		fmt.Println("Masukan jumlah uang :")
+		fmt.Scanln(&newTransfer.Amount)
+		fmt.Println("Masukan nomor penerima :")
+		fmt.Scanln(&)
+
 	case 10: // fitur melihat profil user lain dengan menggunakan phone number
 	case 0: // fitur logout
 
