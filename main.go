@@ -157,13 +157,15 @@ func main() {
 			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
 			for _, v := range users {
 				if loggedin {
-					controllers.HistoryTopup(db, v)
-					fmt.Println("ID :", v.Topup_Id)
-					fmt.Println("User_ID :", v.Id)
-					fmt.Println("Amount :", v.Amount)
-					fmt.Println("Status :", v.Status)
-					fmt.Println("Time :", v.Transaction_time_topup)
-					fmt.Println("==================")
+					result := controllers.HistoryTopup(db, v)
+					for _, v := range result {
+						fmt.Println("ID :", v.Topup_Id)
+						fmt.Println("User_ID :", v.Id)
+						fmt.Println("Amount :", v.Amount)
+						fmt.Println("Status :", v.Status)
+						fmt.Println("Time :", v.Transaction_time_topup)
+						fmt.Println("==================")
+					}
 				}
 			}
 
