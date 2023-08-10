@@ -149,6 +149,53 @@ func main() {
 			}
 
 		case 7: // fitur transfer dana
+			newTransfer := entities.Transfer{}
+			fmt.Println("Masukan ID Pengirim :")
+			fmt.Scanln(&newTransfer.User_id)
+			fmt.Println("Masukan Receiver User ID:")
+			fmt.Scanln(&newTransfer.Receiver_userid)
+			fmt.Println("Masukan Nominal :")
+			fmt.Scanln(&newTransfer.Amount)
+
+			// Insert transfer data
+			tranferResult, errTransfer := db.Exec("INSERT INTO TRANSFERS (user_id, receiver_userid, amount, status) VALUES (?, ?, ?, ?)", newTransfer.User_id, newTransfer.Receiver_userid, newTransfer.Amount, "SUCCESS")
+			if errTransfer != nil {
+				log.Fatal("error transfer", errTransfer.Error())
+			} else {
+				row, _ := tranferResult.RowsAffected()
+				if row > 0 {
+					fmt.Println("transfers success")
+				} else {
+					fmt.Println("transfer failed")
+				}
+
+				// Update receiver's balance
+				updateReceiverBalance, errUpdateBalance := db.Exec("UPDATE users SET balance = balance + ? WHERE id = ?", newTransfer.Amount, newTransfer.Receiver_userid)
+				if errUpdateBalance != nil {
+					log.Fatal("error updating balance", errUpdateBalance.Error())
+				} else {
+					row, _ := updateReceiverBalance.RowsAffected()
+					if row > 0 {
+						fmt.Println("Update balance success")
+					} else {
+						fmt.Println("Update balance failed")
+					}
+				}
+
+				// Update sender's balance
+				updateSenderBalance, errUpdateSenderBalance := db.Exec("UPDATE users SET balance = balance - ? WHERE id = ?", newTransfer.Amount, newTransfer.User_id)
+				if errUpdateSenderBalance != nil {
+					log.Fatal("error updating sender's balance", errUpdateSenderBalance.Error())
+				} else {
+					row, _ := updateSenderBalance.RowsAffected()
+					if row > 0 {
+						fmt.Println("Update sender's balance success")
+					} else {
+						fmt.Println("Update sender's balance failed")
+					}
+				}
+			}
+
 		case 8: // fitur melihat history topup
 			fmt.Println("Top-Up History")
 			loginUser := entities.User{}
@@ -174,6 +221,27 @@ func main() {
 			}
 
 		case 9: // fitur melihat history transfer
+
+			rows, errTranfserHistory := db.Query("SELECT user_id, receiver_userid, amount, status FROM transfers ORDER BY transaction_time")
+			if errTranfserHistory != nil {
+				log.Fatal("view transfer history failed", errTranfserHistory.Error())
+			}
+			var transferHistory []entities.Transfer
+			for rows.Next() {
+				var dataTransferHistory entities.Transfer
+				errScan := rows.Scan(&dataTransferHistory.User_id, &dataTransferHistory.Receiver_userid, &dataTransferHistory.Amount, &dataTransferHistory.Status)
+				if errScan != nil {
+					log.Fatal("error scan", errScan.Error())
+				}
+				transferHistory = append(transferHistory, dataTransferHistory)
+			}
+			for _, v := range transferHistory {
+				fmt.Println("Pengirim :", v.User_id)
+				fmt.Println("Penerima :", v.Receiver_userid)
+				fmt.Println("Jumlah :", v.Amount)
+				fmt.Println("Status :", v.Status)
+			}
+
 		case 10: // fitur melihat profil user lain dengan menggunakan phone number
 			viewByPhone := entities.User{}
 			fmt.Println("Masukan Nomor Telepone :")
