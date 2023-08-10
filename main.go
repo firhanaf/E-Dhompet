@@ -7,6 +7,8 @@ import (
 	"be18/acc-service/controllers"
 	"be18/acc-service/entities"
 
+	"github.com/google/uuid"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -32,8 +34,8 @@ func main() {
 			// biasanya urutannya email, username, password, nama lengkap, nomor telepon, address
 
 			registerUser := entities.User{}
-			fmt.Println("Masukkan ID :") // Email
-			fmt.Scanln(&registerUser.Id)
+			// fmt.Println("Masukkan ID :") // Email
+			// fmt.Scanln(&registerUser.Id)
 			fmt.Println("Masukkan Email :") // Email
 			fmt.Scanln(&registerUser.Email)
 			fmt.Println("Masukkan Username :") // Username
@@ -47,7 +49,9 @@ func main() {
 			fmt.Println("Masukkan Adress :") // Address
 			fmt.Scanln(&registerUser.Address)
 
-			registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", registerUser.Id, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address, 0)
+			uuid := uuid.New()
+
+			registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", uuid, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address, 0)
 			if errRegister != nil {
 				log.Fatal("error insert", errRegister.Error())
 			} else {
