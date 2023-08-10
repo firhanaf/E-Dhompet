@@ -12,8 +12,10 @@ email varchar(100) unique not null,
 password varchar(100) not null
 );
 
+select * from users;
+
 alter table users
-add column balance int not null;
+MODIFY COLUMN balance decimal default 0;
 
 insert into users(id, username, name, address, phone, email, password)
 values("UID-00001", "adi12", "adi", "aceh", "081234", "adi@dai.com", "qwerty"),
@@ -62,5 +64,24 @@ values("UID-00001", 100000, "SUCCESS");
 -- update isi saldo
 update users SET
 balance = 100000 where id = "UID-00001";
+
+select * from topup;
+
+SELECT * FROM TRANSFERS;
+
+insert into transfers(user_id, receiver_userid, amount, status)
+values ("UID-00002", "UID-0003", 50000, "SUCCESS");
+
+insert into transfers(user_id, receiver_userid, amount, status)
+values("UID-00001", "UID-00002", 20000, "SUCCESS");
+
+update users set balance = 100000 where id = "UID-00005";
+-- update users set balance = ? where id = ?;
+
+Select * from users;
+
+select * from transfers;
+
+SELECT user_id, receiver_userid, amount, status FROM transfers;
 
 select * from topup;
