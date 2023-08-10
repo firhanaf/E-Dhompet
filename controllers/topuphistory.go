@@ -12,7 +12,7 @@ func HistoryTopup(db *sql.DB, loginUser entities.User) []entities.User {
 
 	for _, v := range users {
 		if loggedIn {
-			history, errHistory := db.Query("select id, user_id, amount, status, transaction_time from topup where user_id = ?", v.Id)
+			history, errHistory := db.Query("select id, user_id, amount, status, transaction_time from topup where user_id = ? ORDER BY transaction_time desc", v.Id)
 			if errHistory != nil {
 				log.Fatal("error to read topup history", errHistory.Error())
 			}
