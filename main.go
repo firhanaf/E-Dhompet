@@ -154,8 +154,7 @@ func main() {
 			fmt.Scanln(&newTransfer.Amount)
 
 			// Insert transfer data
-			insertQuery := "INSERT INTO TRANSFERS (user_id, receiver_userid, amount, status) VALUES (?, ?, ?, ?)"
-			tranferResult, errTransfer := db.Exec(insertQuery, newTransfer.User_id, newTransfer.Receiver_userid, newTransfer.Amount, newTransfer.Status)
+			tranferResult, errTransfer := db.Exec("INSERT INTO TRANSFERS (user_id, receiver_userid, amount, status) VALUES (?, ?, ?, ?)", newTransfer.User_id, newTransfer.Receiver_userid, newTransfer.Amount, "SUCCESS")
 			if errTransfer != nil {
 				log.Fatal("error transfer", errTransfer.Error())
 			} else {
@@ -216,6 +215,27 @@ func main() {
 			}
 
 		case 9: // fitur melihat history transfer
+
+			rows, errTranfserHistory := db.Query("SELECT user_id, receiver_userid, amount, status FROM transfers ORDER BY transaction_time")
+			if errTranfserHistory != nil {
+				log.Fatal("view transfer history failed", errTranfserHistory.Error())
+			}
+			var transferHistory []entities.Transfer
+			for rows.Next() {
+				var dataTransferHistory entities.Transfer
+				errScan := rows.Scan(&dataTransferHistory.User_id, &dataTransferHistory.Receiver_userid, &dataTransferHistory.Amount, &dataTransferHistory.Status)
+				if errScan != nil {
+					log.Fatal("error scan", errScan.Error())
+				}
+				transferHistory = append(transferHistory, dataTransferHistory)
+			}
+			for _, v := range transferHistory {
+				fmt.Println("Pengirim :", v.User_id)
+				fmt.Println("Penerima :", v.Receiver_userid)
+				fmt.Println("Jumlah :", v.Amount)
+				fmt.Println("Status :", v.Status)
+			}
+
 		case 10: // fitur melihat profil user lain dengan menggunakan phone number
 			viewByPhone := entities.User{}
 			fmt.Println("Masukan Nomor Telepone :")
