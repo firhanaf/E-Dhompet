@@ -145,6 +145,54 @@ func main() {
 			}
 
 		case 7: // fitur transfer dana
+			newTransfer := entities.Transfer{}
+			fmt.Println("Masukan ID Pengirim :")
+			fmt.Scanln(&newTransfer.User_id)
+			fmt.Println("Masukan Receiver User ID:")
+			fmt.Scanln(&newTransfer.Receiver_userid)
+			fmt.Println("Masukan Nominal :")
+			fmt.Scanln(&newTransfer.Amount)
+
+			// Insert transfer data
+			insertQuery := "INSERT INTO TRANSFERS (user_id, receiver_userid, amount, status) VALUES (?, ?, ?, ?)"
+			tranferResult, errTransfer := db.Exec(insertQuery, newTransfer.User_id, newTransfer.Receiver_userid, newTransfer.Amount, newTransfer.Status)
+			if errTransfer != nil {
+				log.Fatal("error transfer", errTransfer.Error())
+			} else {
+				row, _ := tranferResult.RowsAffected()
+				if row > 0 {
+					fmt.Println("transfers success")
+				} else {
+					fmt.Println("transfer failed")
+				}
+
+				// Update receiver's balance
+				updateReceiverBalance, errUpdateBalance := db.Exec("UPDATE users SET balance = balance + ? WHERE id = ?", newTransfer.Amount, newTransfer.Receiver_userid)
+				if errUpdateBalance != nil {
+					log.Fatal("error updating balance", errUpdateBalance.Error())
+				} else {
+					row, _ := updateReceiverBalance.RowsAffected()
+					if row > 0 {
+						fmt.Println("Update balance success")
+					} else {
+						fmt.Println("Update balance failed")
+					}
+				}
+
+				// Update sender's balance
+				updateSenderBalance, errUpdateSenderBalance := db.Exec("UPDATE users SET balance = balance - ? WHERE id = ?", newTransfer.Amount, newTransfer.User_id)
+				if errUpdateSenderBalance != nil {
+					log.Fatal("error updating sender's balance", errUpdateSenderBalance.Error())
+				} else {
+					row, _ := updateSenderBalance.RowsAffected()
+					if row > 0 {
+						fmt.Println("Update sender's balance success")
+					} else {
+						fmt.Println("Update sender's balance failed")
+					}
+				}
+			}
+
 		case 8: // fitur melihat history topup
 			fmt.Println("Top-Up History")
 			loginUser := entities.User{}

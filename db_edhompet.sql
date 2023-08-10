@@ -66,3 +66,13 @@ update users SET
 balance = 100000 where id = "UID-00001";
 
 select * from topup;
+
+SELECT * FROM TRANSFERS;
+
+INSERT INTO TRANSFERS (user_id,receiver_userid, amount, status)
+values ("UID-00002", "UID-0003", 50000, "SUCCESS");
+
+insert into transfers(user_id, receiver_userid, amount, status)
+values("UID-00001", "UID-00002", 20000, "SUCCESS");
+
+
