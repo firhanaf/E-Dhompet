@@ -13,7 +13,7 @@ func UpdateUser(db *sql.DB, loginUser entities.User) {
 	for _, v := range users {
 		if loggedIn {
 			fmt.Println("Hello", v.Name)
-			fmt.Println("Pilih Menu:\n1. Update email.\n2. Update password.\n3. Update address.\n4. Update Phone Number")
+			fmt.Println("Pilih Menu:\n1. Update email.\n2. Update password.\n3. Update address.\n4. Update Phone Number.\n0. Back to Menu")
 			var menuUpdate int
 			fmt.Println("input pilihan anda:")
 			fmt.Scanln(&menuUpdate)
@@ -32,6 +32,9 @@ func UpdateUser(db *sql.DB, loginUser entities.User) {
 			if menuUpdate == 4 {
 				fmt.Println("Input new Phone Number:")
 				fmt.Scanln(&updateUser.Phone)
+			}
+			if menuUpdate == 0 {
+				return
 			}
 
 			if menuUpdate == 1 {
