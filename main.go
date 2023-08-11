@@ -215,8 +215,12 @@ func main() {
 			}
 
 		case 9: // fitur melihat history transfer
+			historyUserID := entities.User{}
 
-			rows, errTranfserHistory := db.Query("SELECT user_id, receiver_userid, amount, status FROM transfers ORDER BY transaction_time")
+			fmt.Println("Masukan user_id :")
+			fmt.Scanln(&historyUserID.Id)
+
+			rows, errTranfserHistory := db.Query("SELECT user_id, receiver_userid, amount, status FROM transfers WHERE user_id = ? ORDER BY transaction_time", historyUserID.Id)
 			if errTranfserHistory != nil {
 				log.Fatal("view transfer history failed", errTranfserHistory.Error())
 			}
