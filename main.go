@@ -7,6 +7,8 @@ import (
 	"be18/acc-service/controllers"
 	"be18/acc-service/entities"
 
+	"github.com/google/uuid"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -19,6 +21,7 @@ func main() {
 	defer db.Close()
 
 	//Main Menu
+	var loggedInUser entities.User
 	for {
 		fmt.Println("Selamat Datang di E-Dhompet")
 		fmt.Println("Pilih Menu: \n 1. Register \n 2. Login \n 3. View Profile \n 4. Update Profile \n 5. Delete Account \n 6. Top Up \n 7. Transfer \n 8. Top Up History \n 9. Transfer History \n 10. View Profile by Phone Number \n 0. Log Out")
@@ -32,8 +35,8 @@ func main() {
 			// biasanya urutannya email, username, password, nama lengkap, nomor telepon, address
 
 			registerUser := entities.User{}
-			fmt.Println("Masukkan ID :") // Email
-			fmt.Scanln(&registerUser.Id)
+			// fmt.Println("Masukkan ID :") // Email
+			// fmt.Scanln(&registerUser.Id)
 			fmt.Println("Masukkan Email :") // Email
 			fmt.Scanln(&registerUser.Email)
 			fmt.Println("Masukkan Username :") // Username
@@ -47,7 +50,9 @@ func main() {
 			fmt.Println("Masukkan Adress :") // Address
 			fmt.Scanln(&registerUser.Address)
 
-			registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", registerUser.Id, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address, 0)
+			uuid := uuid.New()
+
+			registerRows, errRegister := db.Exec("INSERT INTO Users (id, name, username, email, phone, password, address, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", uuid, registerUser.Name, registerUser.Username, registerUser.Email, registerUser.Phone, registerUser.Password, registerUser.Address, 0)
 			if errRegister != nil {
 				log.Fatal("error insert", errRegister.Error())
 			} else {
@@ -67,48 +72,47 @@ func main() {
 			fmt.Println("Masukkan Password :")
 			fmt.Scanln(&loginUser.Password)
 
-			users, login := controllers.Login(db, loginUser.Phone, loginUser.Password)
-			for _, v := range users {
-				if login {
-					fmt.Println("Login Success!\nWelcome", v.Name)
-				} else {
-					fmt.Println("Invalid phone or password")
-				}
+			users, loggedIn := controllers.Login(db, loginUser.Phone, loginUser.Password)
+			if loggedIn && len(users) > 0 {
+				loggedInUser = users[0] // Store the logged-in user
+				fmt.Println("Login Success!\nWelcome", loggedInUser.Name)
+			} else {
+				fmt.Println("Login Failed!")
 			}
 
 		case 3: // view profile yang telah login
 			fmt.Println("View Profile")
-			loginUser := entities.User{}
-			fmt.Print("Masukkan Nomor Telepon : ")
-			fmt.Scanln(&loginUser.Phone)
-			fmt.Print("Masukkan Password : ")
-			fmt.Scanln(&loginUser.Password)
+			// loginUser := entities.User{}
+			// fmt.Print("Masukkan Nomor Telepon : ")
+			// fmt.Scanln(&loginUser.Phone)
+			// fmt.Print("Masukkan Password : ")
+			// fmt.Scanln(&loginUser.Password)
 
-			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
-			for _, v := range users {
-				if loggedin {
-					fmt.Println("=========================")
-					fmt.Println("Displaying Profile of:", v.Name)
-					fmt.Println("=========================")
-					controllers.ReadProfile(db, v)
-				} else {
-					fmt.Println("Invalid phone or password")
-				}
+			// users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
+			// for _, v := range users {
+			if loggedInUser.Id != "" {
+				fmt.Println("=========================")
+				fmt.Println("Displaying Profile of:", loggedInUser.Name)
+				fmt.Println("=========================")
+				controllers.ReadProfile(db, loggedInUser)
+			} else {
+				fmt.Println("Please login first!")
 			}
 
 		case 4: // update profil
 
 			fmt.Println("Update Profile")
-			loginUser := entities.User{}
-			fmt.Print("Masukkan Nomor Telepon : ")
-			fmt.Scanln(&loginUser.Phone)
-			fmt.Print("Masukkan Password : ")
-			fmt.Scanln(&loginUser.Password)
-			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
-			for _, v := range users {
-				if loggedin {
-					controllers.UpdateUser(db, v)
-				}
+			// loginUser := entities.User{}
+			// fmt.Print("Masukkan Nomor Telepon : ")
+			// fmt.Scanln(&loginUser.Phone)
+			// fmt.Print("Masukkan Password : ")
+			// fmt.Scanln(&loginUser.Password)
+			// users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
+			// for _, v := range users {
+			if loggedInUser.Id != "" {
+				controllers.UpdateUser(db, loggedInUser)
+			} else {
+				fmt.Println("Please login first!")
 			}
 
 		case 5: // hapus akun
@@ -128,20 +132,23 @@ func main() {
 					fmt.Println("Delete Failed")
 				}
 			}
+
 		case 6: // fitur topup saldo
 			fmt.Println("Top Up Balance")
-			loginUser := entities.User{}
-			fmt.Print("Masukkan Nomor Telepon : ")
-			fmt.Scanln(&loginUser.Phone)
-			fmt.Print("Masukkan Password : ")
-			fmt.Scanln(&loginUser.Password)
+			// loginUser := entities.User{}
+			// fmt.Print("Masukkan Nomor Telepon : ")
+			// fmt.Scanln(&loginUser.Phone)
+			if loggedInUser.Id != "" {
+				fmt.Print("Masukkan Password : ")
+				fmt.Scanln(&loggedInUser.Password)
 
-			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
-			for _, v := range users {
-				if loggedin {
-					fmt.Println("Balance :", v.Balance)
-					controllers.AddMoney(db, v)
-				}
+				// users, loggedin := controllers.Login(db, loggedInUser.Phone, loggedInUser.Password)
+				// for _, v := range users {
+				fmt.Println("Balance :", loggedInUser.Balance)
+				controllers.AddMoney(db, loggedInUser)
+			} else {
+				fmt.Println("Please login first!")
+
 			}
 
 		case 7: // fitur transfer dana
@@ -194,27 +201,35 @@ func main() {
 
 		case 8: // fitur melihat history topup
 			fmt.Println("Top-Up History")
-			loginUser := entities.User{}
-			fmt.Print("Masukkan Nomor Telepon : ")
-			fmt.Scanln(&loginUser.Phone)
-			fmt.Print("Masukkan Password : ")
-			fmt.Scanln(&loginUser.Password)
-			fmt.Println("==================")
+			// loginUser := entities.User{}
+			// fmt.Print("Masukkan Nomor Telepon : ")
+			// fmt.Scanln(&loginUser.Phone)
+			if loggedInUser.Id != "" {
+				fmt.Print("Masukkan Password : ")
+				fmt.Scanln(&loggedInUser.Password)
+				// fmt.Println("==================")
 
-			users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
-			for _, v := range users {
-				if loggedin {
-					controllers.HistoryTopup(db, v)
+				// users, loggedin := controllers.Login(db, loginUser.Phone, loginUser.Password)
+				// for _, v := range users {
+				// if loggedin {
+
+				result := controllers.HistoryTopup(db, loggedInUser)
+				for _, v := range result {
 					fmt.Println("ID :", v.Topup_Id)
 					fmt.Println("User_ID :", v.Id)
+					fmt.Println("Name :", v.Name)
 					fmt.Println("Amount :", v.Amount)
 					fmt.Println("Status :", v.Status)
+					fmt.Println("Updated Balance :", v.Balance+v.Amount)
 					fmt.Println("Time :", v.Transaction_time_topup)
 					fmt.Println("==================")
 				}
+			} else {
+				fmt.Println("Please login first!")
 			}
 
 		case 9: // fitur melihat history transfer
+
 			historyUserID := entities.Transfer{}
 
 			fmt.Println("Masukan user_id :")
@@ -238,8 +253,8 @@ func main() {
 				fmt.Println("Penerima :", v.Receiver_userid)
 				fmt.Println("Jumlah :", v.Amount)
 				fmt.Println("Status :", v.Status)
-			}
 
+			}
 		case 10: // fitur melihat profil user lain dengan menggunakan phone number
 			viewByPhone := entities.User{}
 			fmt.Println("Masukan Nomor Telepone :")
