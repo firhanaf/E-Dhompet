@@ -215,7 +215,7 @@ func main() {
 			}
 
 		case 9: // fitur melihat history transfer
-			historyUserID := entities.User{}
+			historyUserID := entities.Transfer{}
 
 			fmt.Println("Masukan user_id :")
 			fmt.Scanln(&historyUserID.Id)
